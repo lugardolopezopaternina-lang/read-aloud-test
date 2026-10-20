@@ -26,7 +26,6 @@
       border-radius: 8px;
       padding: 2.5rem;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      position: relative;
     }
 
     .benchmark-tag {
@@ -64,15 +63,15 @@
       font-weight: 600;
       color: var(--text-dark);
       line-height: 1.5;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
     .recorder-box {
       border: 1px solid #94a3b8;
       background: var(--bg-slate);
       border-radius: 4px;
-      width: 320px;
-      margin: 0 auto 2rem auto;
+      width: 340px;
+      margin: 0 auto 1.5rem auto;
       text-align: center;
       padding: 1.25rem 1rem;
     }
@@ -107,8 +106,8 @@
     .progress-bar {
       height: 100%;
       width: 0%;
-      background: #475569;
-      transition: width 1s linear;
+      background: #00877c;
+      transition: width 0.5s linear;
     }
 
     .prompt-text {
@@ -118,7 +117,6 @@
       border-top: 1px solid #e2e8f0;
       padding-top: 1.5rem;
       margin-bottom: 1.5rem;
-      min-height: 100px;
     }
 
     .controls {
@@ -132,14 +130,15 @@
       background: var(--primary-teal);
       color: white;
       border: none;
-      padding: 0.65rem 1.4rem;
+      padding: 0.7rem 1.5rem;
       font-size: 0.95rem;
       font-weight: 600;
       border-radius: 4px;
       cursor: pointer;
     }
-    button:disabled { background: #94a3b8; cursor: not-allowed; }
+    button:disabled { background: #cbd5e1; cursor: not-allowed; }
     .btn-secondary { background: #475569; }
+    .btn-stop { background: var(--accent-red); display: none; }
 
     .feedback-panel {
       display: none;
@@ -159,7 +158,7 @@
       margin-bottom: 1rem;
     }
 
-    .word-correct { color: var(--accent-green); font-weight: 600; }
+    .word-correct { color: var(--accent-green); font-weight: 700; }
     .word-missed { color: var(--accent-red); text-decoration: line-through; margin-right: 2px; }
 
     .audio-comparison {
@@ -179,7 +178,7 @@
       justify-content: space-between;
       gap: 1rem;
     }
-    .audio-row span { font-weight: 600; font-size: 0.95rem; color: #475569; width: 160px; }
+    .audio-row span { font-weight: 600; font-size: 0.95rem; color: #475569; width: 170px; }
     .audio-row audio { width: 100%; max-width: 480px; }
   </style>
 </head>
@@ -195,7 +194,7 @@
     </div>
 
     <div class="instructions">
-      You have 25 seconds to prepare. After the beep, read the text aloud in a clear voice.
+      Prepare to read the text aloud. Click "Start Test", wait for the countdown, and read clearly into your microphone.
     </div>
 
     <div class="recorder-box">
@@ -210,10 +209,20 @@
       I really thought today would be different. I woke up early, made actual coffee instead of that terrible instant stuff, and even ironed my shirt. For once, I felt completely in control of my life. Then, I heard the heavy click of the front door shutting behind me, and my stomach dropped. My keys are sitting right there on the kitchen counter, next to my phone and my wallet. Now I’m standing in the hallway in my socks, listening to my phone ring inside an empty apartment. Sometimes I wonder if the universe is trying to tell me to stay in bed.
     </div>
 
+    <!-- BOTONES CON ONCLICK DIRECTO PARA QUE NUNCA FALLEN -->
     <div class="controls">
-      <button class="btn-secondary" id="prevBtn" type="button" disabled>Previous</button>
-      <button id="startBtn" type="button">Start Test</button>
-      <button class="btn-secondary" id="nextBtn" type="button">Next</button>
+      <button class="btn-secondary" id="prevBtn" type="button" onclick="prevQuestion()" disabled>Previous</button>
+      <button id="startBtn" type="button" onclick="startTest()">Start Test</button>
+      <button class="btn-stop" id="stopBtn" type="button" onclick="finishRecordingEarly()">Stop & Evaluate</button>
+      <button class="btn-secondary" id="nextBtn" type="button" onclick="nextQuestion()">Next</button>
+    </div>
+
+    <!-- REPRODUCTOR DEL AUDIO MODELO SIEMPRE VISIBLE Y ACCESIBLE -->
+    <div class="audio-comparison" style="margin-top: 1.5rem;">
+      <div class="audio-row">
+        <span>Model audio (Reference):</span>
+        <audio id="modelAudioPlayback" controls src="audio1.mp3"></audio>
+      </div>
     </div>
 
     <div class="feedback-panel" id="feedbackPanel">
@@ -228,10 +237,6 @@
         <div class="audio-row">
           <span>Your recording:</span>
           <audio id="userAudioPlayback" controls></audio>
-        </div>
-        <div class="audio-row">
-          <span>Model audio:</span>
-          <audio id="modelAudioPlayback" controls src="audio1.mp3"></audio>
         </div>
       </div>
     </div>
@@ -302,17 +307,19 @@
     ];
 
     let currentIndex = 0;
-    const PREPARATION_TIME = 25;
+    const PREPARATION_TIME = 5; // 5 segundos para que veas el cambio rápido
     const RECORDING_TIME = 45;
 
-    let mediaRecorder;
+    let mediaRecorder = null;
     let audioChunks = [];
-    let timerInterval;
+    let timerInterval = null;
+    let recInterval = null;
     let recognition = null;
     let spokenTranscript = "";
 
     function updateQuestionUI() {
       if (timerInterval) clearInterval(timerInterval);
+      if (recInterval) clearInterval(recInterval);
 
       const q = questions[currentIndex];
       document.getElementById('counterLabel').textContent = "Question " + q.id + " of " + questions.length;
@@ -320,7 +327,9 @@
       document.getElementById('targetScript').textContent = q.script;
 
       document.getElementById('feedbackPanel').style.display = 'none';
+      document.getElementById('startBtn').style.display = 'inline-block';
       document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').style.display = 'none';
       document.getElementById('boxTitle').textContent = "STATUS";
       document.getElementById('timerLabel').textContent = 'Click "Start Test" to begin';
       document.getElementById('timerLabel').classList.remove('recording');
@@ -329,10 +338,25 @@
       const model = document.getElementById('modelAudioPlayback');
       if (model) {
         model.src = q.audio;
+        model.load();
       }
 
       document.getElementById('prevBtn').disabled = (currentIndex === 0);
       document.getElementById('nextBtn').disabled = (currentIndex === questions.length - 1);
+    }
+
+    function prevQuestion() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateQuestionUI();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentIndex < questions.length - 1) {
+        currentIndex++;
+        updateQuestionUI();
+      }
     }
 
     function playBeep() {
@@ -347,9 +371,7 @@
         gain.connect(audioCtx.destination);
         osc.start();
         osc.stop(audioCtx.currentTime + 0.4);
-      } catch (e) {
-        console.warn("AudioContext error:", e);
-      }
+      } catch (e) {}
     }
 
     async function startTest() {
@@ -360,7 +382,157 @@
       const progressBar = document.getElementById('progressBar');
       const boxTitle = document.getElementById('boxTitle');
 
+      // Cambio inmediato en pantalla al hacer clic
+      boxTitle.textContent = "REQUESTING MIC...";
+      timerLabel.textContent = "Please allow microphone access...";
+
       startBtn.disabled = true;
       prevBtn.disabled = true;
       nextBtn.disabled = true;
-      document.
+      document.getElementById('feedbackPanel').style.display = 'none';
+      spokenTranscript = "";
+
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (err) {
+        boxTitle.textContent = "MIC BLOCKED";
+        timerLabel.textContent = "Error: Please allow microphone permission in browser";
+        alert("Microphone access denied or blocked. Click the lock icon in the address bar and set Microphone to 'Allow'.");
+        startBtn.disabled = false;
+        prevBtn.disabled = (currentIndex === 0);
+        nextBtn.disabled = (currentIndex === questions.length - 1);
+        return;
+      }
+
+      boxTitle.textContent = "PREPARATION";
+      let timeLeft = PREPARATION_TIME;
+      timerLabel.textContent = "Beginning in " + timeLeft + " seconds";
+      timerLabel.classList.remove('recording');
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        const percentage = ((PREPARATION_TIME - timeLeft) / PREPARATION_TIME) * 100;
+        progressBar.style.width = percentage + "%";
+
+        if (timeLeft > 0) {
+          timerLabel.textContent = "Beginning in " + timeLeft + " seconds";
+        } else {
+          clearInterval(timerInterval);
+          playBeep();
+          setTimeout(() => startRecording(stream), 400);
+        }
+      }, 1000);
+    }
+
+    function startRecording(stream) {
+      const timerLabel = document.getElementById('timerLabel');
+      const progressBar = document.getElementById('progressBar');
+      const boxTitle = document.getElementById('boxTitle');
+      const userAudioPlayback = document.getElementById('userAudioPlayback');
+
+      document.getElementById('startBtn').style.display = 'none';
+      document.getElementById('stopBtn').style.display = 'inline-block';
+
+      audioChunks = [];
+      try {
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) audioChunks.push(e.data);
+        };
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          userAudioPlayback.src = URL.createObjectURL(audioBlob);
+          stream.getTracks().forEach(t => t.stop());
+          evaluateReading();
+        };
+        mediaRecorder.start();
+      } catch (e) {}
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        try {
+          recognition = new SpeechRecognition();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.lang = 'en-US';
+          recognition.onresult = (event) => {
+            let finalTrans = "";
+            for (let i = 0; i < event.results.length; ++i) {
+              finalTrans += " " + event.results[i][0].transcript;
+            }
+            spokenTranscript = finalTrans;
+          };
+          recognition.start();
+        } catch (e) {}
+      }
+
+      boxTitle.textContent = "RECORDING NOW";
+      timerLabel.classList.add('recording');
+      let recLeft = RECORDING_TIME;
+      progressBar.style.width = '0%';
+      timerLabel.textContent = "Speak now! Time remaining: " + recLeft + "s";
+
+      recInterval = setInterval(() => {
+        recLeft--;
+        const percentage = ((RECORDING_TIME - recLeft) / RECORDING_TIME) * 100;
+        progressBar.style.width = percentage + "%";
+        timerLabel.textContent = "Speak now! Time remaining: " + recLeft + "s";
+
+        if (recLeft <= 0) {
+          finishRecordingEarly();
+        }
+      }, 1000);
+    }
+
+    function finishRecordingEarly() {
+      if (recInterval) clearInterval(recInterval);
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+      if (recognition) {
+        try { recognition.stop(); } catch (e) {}
+      }
+      document.getElementById('boxTitle').textContent = "COMPLETED";
+      document.getElementById('timerLabel').textContent = "Test Completed";
+      document.getElementById('stopBtn').style.display = 'none';
+      document.getElementById('startBtn').style.display = 'inline-block';
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('prevBtn').disabled = (currentIndex === 0);
+      document.getElementById('nextBtn').disabled = (currentIndex === questions.length - 1);
+    }
+
+    function cleanWord(str) {
+      return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function evaluateReading() {
+      const originalWords = questions[currentIndex].script.split(/\s+/);
+      const spokenWords = spokenTranscript.split(/\s+/).map(cleanWord).filter(w => w.length > 0);
+
+      let correctCount = 0;
+      let spokenIdx = 0;
+      let htmlOutput = "";
+
+      originalWords.forEach(word => {
+        const clean = cleanWord(word);
+        const searchWindow = spokenWords.slice(spokenIdx, spokenIdx + 5);
+        const found = searchWindow.indexOf(clean);
+
+        if (found !== -1) {
+          correctCount++;
+          spokenIdx += found + 1;
+          htmlOutput += '<span class="word-correct">' + word + '</span> ';
+        } else {
+          htmlOutput += '<span class="word-missed">' + word + '</span> ';
+        }
+      });
+
+      const accuracy = originalWords.length > 0 ? Math.round((correctCount / originalWords.length) * 100) : 0;
+      document.getElementById('scoreBadge').textContent = "Accuracy: " + accuracy + "% (" + correctCount + " of " + originalWords.length + " words)";
+      document.getElementById('scriptComparison').innerHTML = htmlOutput;
+      document.getElementById('feedbackPanel').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
