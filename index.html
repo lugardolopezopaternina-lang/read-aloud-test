@@ -118,7 +118,7 @@
       border-top: 1px solid #e2e8f0;
       padding-top: 1.5rem;
       margin-bottom: 1.5rem;
-      min-height: 120px;
+      min-height: 100px;
     }
 
     .controls {
@@ -206,10 +206,12 @@
       </div>
     </div>
 
-    <div class="prompt-text" id="targetScript">Loading...</div>
+    <div class="prompt-text" id="targetScript">
+      I really thought today would be different. I woke up early, made actual coffee instead of that terrible instant stuff, and even ironed my shirt. For once, I felt completely in control of my life. Then, I heard the heavy click of the front door shutting behind me, and my stomach dropped. My keys are sitting right there on the kitchen counter, next to my phone and my wallet. Now I’m standing in the hallway in my socks, listening to my phone ring inside an empty apartment. Sometimes I wonder if the universe is trying to tell me to stay in bed.
+    </div>
 
     <div class="controls">
-      <button class="btn-secondary" id="prevBtn" type="button">Previous</button>
+      <button class="btn-secondary" id="prevBtn" type="button" disabled>Previous</button>
       <button id="startBtn" type="button">Start Test</button>
       <button class="btn-secondary" id="nextBtn" type="button">Next</button>
     </div>
@@ -229,7 +231,136 @@
         </div>
         <div class="audio-row">
           <span>Model audio:</span>
-          <audio id="modelAudioPlayback" controls></audio>
+          <audio id="modelAudioPlayback" controls src="audio1.mp3"></audio>
         </div>
       </div>
     </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        id: 1,
+        level: "B1",
+        script: "I really thought today would be different. I woke up early, made actual coffee instead of that terrible instant stuff, and even ironed my shirt. For once, I felt completely in control of my life. Then, I heard the heavy click of the front door shutting behind me, and my stomach dropped. My keys are sitting right there on the kitchen counter, next to my phone and my wallet. Now I’m standing in the hallway in my socks, listening to my phone ring inside an empty apartment. Sometimes I wonder if the universe is trying to tell me to stay in bed.",
+        audio: "audio1.mp3"
+      },
+      {
+        id: 2,
+        level: "B1",
+        script: "Please don't look at my resume too closely. Yes, it says I'm fluent in French, and technically, I did pass an online course three years ago, so that isn't a complete lie. If you ask me to order a croissant, I will absolutely shine. However, if you expect me to negotiate a corporate merger in Paris, we might run into a slight communication barrier. What I lack in vocabulary, though, I make up for in sheer panic-driven determination. Hire me, and I promise I will work twice as hard just to cover up the things I don't actually know yet.",
+        audio: "audio2.mp3"
+      },
+      {
+        id: 3,
+        level: "B1+",
+        script: "The station platform was supposed to be empty at midnight, yet there she was, holding a bright yellow umbrella under a completely clear sky. I told myself to look away and mind my own business, just like anyone living in this city would do. When the train finally pulled in, the lights inside the carriages flickered and died for a second. By the time they came back on, she was gone, but the yellow umbrella was lying right at my feet. Inside the handle, someone had taped a small brass key and a note with my own name on it.",
+        audio: "audio3.mp3"
+      },
+      {
+        id: 4,
+        level: "B1+",
+        script: "You don't need to keep apologizing, because honestly, I saw this coming months ago. People don't just suddenly stop asking how your day went unless they've already checked out of the relationship. I kept making excuses for you—telling myself you were just stressed with work or tired from the commute. The truth is, I was working overtime to keep us together while you were quietly packing your bags in your head. I'm not even angry anymore; I'm just exhausted from trying to love someone who isn't really in the room. Take your things, and please, just close the door quietly.",
+        audio: "audio4.mp3"
+      },
+      {
+        id: 5,
+        level: "B1+",
+        script: "Thank you so much for seeing me today! I know the casting call asked for a fierce, intimidating medieval warrior, and I realize I look more like an accountant who gets nervous ordering spicy food. However, acting is all about transformation, isn't it? If you just squint a little and ignore my glasses, you can practically see the bloodthirsty rage behind my eyes. Wait, please don't write anything down yet! Let me show you my battle cry. Okay, maybe that sounded a bit like a startled seagull, but with proper lighting and a heavy sword, I’ll be terrifying, I swear!",
+        audio: "audio5.mp3"
+      },
+      {
+        id: 6,
+        level: "B2",
+        script: "We buried this rusty metal box in the backyard twenty years ago, convinced we would still be best friends when we dug it up. Looking at these faded photographs and silly notes now, it feels like I’m reading about strangers. Back then, our biggest worry was passing math class and saving enough allowance to buy concert tickets. We promised we would never become boring adults who cared about mortgages and rush hour traffic, yet here I am, checking my watch before I even finish opening it. I wonder where you are today, and if you ever think about this afternoon.",
+        audio: "audio6.mp3"
+      },
+      {
+        id: 7,
+        level: "B2",
+        script: "Everyone in this family thinks my grandmother’s famous chocolate cake is a hundred-year-old culinary masterpiece passed down through generations. Before she passed away, she made me swear I would protect the secret with my life, and finally handed me the locked recipe box. Do you want to know what was inside? An empty cardboard box of supermarket cake mix and a sticky note that said, \"Just add an extra egg and a spoonful of instant coffee.\" I have been lying to my relatives every Christmas for five years, and honestly, the guilt tastes almost as good as the frosting.",
+        audio: "audio7.mp3"
+      },
+      {
+        id: 8,
+        level: "B2",
+        script: "If you are watching this video, it means I didn't make it to the airport in time. For the past three years, I’ve been working in the accounting department at NexaCorp, and what I discovered last Tuesday goes way beyond simple tax evasion. They aren't just hiding money; they are covering up safety failures that could affect thousands of people in this city. I tried taking the files to my supervisor, and twenty minutes later, my security badge was deactivated. Everything you need to prove what they've done is on the blue flash drive taped underneath my desk drawer.",
+        audio: "audio8.mp3"
+      },
+      {
+        id: 9,
+        level: "B2+",
+        script: "Social media really lied to me about backpacking through Europe. In the photos, everyone looks effortless and glowing while sipping espresso in quiet cobblestone alleys. Meanwhile, I have been carrying a forty-pound backpack up six flights of stairs because the hostel elevator has been broken since 1998. Yesterday, I accidentally boarded an express train going in the completely wrong direction and ended up in a tiny village where nobody speaks English, and the only restaurant was closed for a local goat festival. My feet hurt, I’m broke, and yet, strangely enough, I don't think I want to go home.",
+        audio: "audio9.mp3"
+      },
+      {
+        id: 10,
+        level: "B2+",
+        script: "I know I’m the last person you want to see on your doorstep right now, and if you slam the door in my face, I completely deserve it. Back then, I was so terrified of failing that I chose to ruin everything before it had a chance to fall apart on its own. Walking away without an explanation was cowardly, and it’s the biggest regret of my life. I didn't come here expecting you to forgive me right away, or even at all. I just needed you to know that you were never the problem—I was.",
+        audio: "audio10.mp3"
+      }
+    ];
+
+    let currentIndex = 0;
+    const PREPARATION_TIME = 25;
+    const RECORDING_TIME = 45;
+
+    let mediaRecorder;
+    let audioChunks = [];
+    let timerInterval;
+    let recognition = null;
+    let spokenTranscript = "";
+
+    function updateQuestionUI() {
+      if (timerInterval) clearInterval(timerInterval);
+
+      const q = questions[currentIndex];
+      document.getElementById('counterLabel').textContent = "Question " + q.id + " of " + questions.length;
+      document.getElementById('levelLabel').textContent = "Level: " + q.level;
+      document.getElementById('targetScript').textContent = q.script;
+
+      document.getElementById('feedbackPanel').style.display = 'none';
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('boxTitle').textContent = "STATUS";
+      document.getElementById('timerLabel').textContent = 'Click "Start Test" to begin';
+      document.getElementById('timerLabel').classList.remove('recording');
+      document.getElementById('progressBar').style.width = '0%';
+
+      const model = document.getElementById('modelAudioPlayback');
+      if (model) {
+        model.src = q.audio;
+      }
+
+      document.getElementById('prevBtn').disabled = (currentIndex === 0);
+      document.getElementById('nextBtn').disabled = (currentIndex === questions.length - 1);
+    }
+
+    function playBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+      } catch (e) {
+        console.warn("AudioContext error:", e);
+      }
+    }
+
+    async function startTest() {
+      const startBtn = document.getElementById('startBtn');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const timerLabel = document.getElementById('timerLabel');
+      const progressBar = document.getElementById('progressBar');
+      const boxTitle = document.getElementById('boxTitle');
+
+      startBtn.disabled = true;
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+      document.
