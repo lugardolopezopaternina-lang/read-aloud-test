@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speaking and Reading: Read Aloud</title>
+  <style>
+    :root {
+      --primary-teal: #00877c;
+      --border-gray: #d0d5dd;
+      --text-dark: #1f2937;
+      --accent-red: #d92d20;
+      --accent-blue: #0284c7;
+      --accent-green: #15803d;
+      --bg-slate: #f8fafc;
+    }
+
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #f1f5f9; padding: 2rem 1rem; display: flex; justify-content: center; }
+
+    .test-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 820px;
+      border: 1px solid var(--border-gray);
+      border-radius: 8px;
+      padding: 2.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      position: relative;
+    }
+
+    .benchmark-tag {
+      background-color: var(--primary-teal);
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 0.35rem 0.8rem;
+      display: inline-block;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .main-title {
+      font-size: 2.2rem;
+      color: var(--primary-teal);
+      font-family: Georgia, serif;
+      font-style: italic;
+      margin: 0 0 1rem 0;
+    }
+    .main-title strong { font-style: normal; font-weight: 700; }
+
+    .meta-bar {
+      display: flex;
+      justify-content: space-between;
+      color: #64748b;
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .instructions {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+
+    .recorder-box {
+      border: 1px solid #94a3b8;
+      background: var(--bg-slate);
+      border-radius: 4px;
+      width: 320px;
+      margin: 0 auto 2rem auto;
+      text-align: center;
+      padding: 1.25rem 1rem;
+    }
+
+    .status-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .status-message {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--accent-red);
+      min-height: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .status-message.recording { color: var(--accent-blue); }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 12px;
+      background: #e2e8f0;
+      border: 1px solid #94a3b8;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #475569;
+      transition: width 1s linear;
+    }
+
+    .prompt-text {
+      font-size: 1.2rem;
+      line-height: 1.85;
+      color: #334155;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    button {
+      background: var(--primary-teal);
+      color: white;
+      border: none;
+      padding: 0.65rem 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    button:disabled { background: #94a3b8; cursor: not-allowed; opacity: 1; }
+    .btn-secondary { background: #475569; }
+
+    .feedback-panel {
+      display: none;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid #e2e8f0;
+    }
+
+    .score-badge {
+      display: inline-block;
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 0.4rem 0.9rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .word-correct { color: var(--accent-green); font-weight: 600; }
+    .word-missed { color: var(--accent-red); text-decoration: line-through; margin-right: 2px; }
+
+    .audio-comparison {
+      margin-top: 1.5rem;
+      background: var(--bg-slate);
+      padding: 1rem;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .audio-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .audio-row span { font-weight: 600; font-size: 0.9rem; color: #475569; width: 150px; }
+  </style>
+</head>
+<body>
+
+  <div class="test-card">
+    <div class="benchmark-tag">Benchmark Test Question Types</div>
+    <div class="main-title"><strong>Speaking and Reading:</strong> Read Aloud</div>
+
+    <div class="meta-bar">
+      <span id="counterLabel">Question 1 of 20</span>
+      <span id="levelLabel">Level: B1</span>
+    </div>
+
+    <div class="instructions">
+      You have 25 seconds to prepare. After the beep, read the text aloud in a clear voice.
+    </div>
+
+    <!-- Módulo Central del Grabador -->
+    <div class="recorder-box">
+      <div class="status-title" id="boxTitle">STATUS</div>
+      <div class="status-message" id="timerLabel">Click "Start Test" to begin</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Texto que el alumno debe leer -->
+    <div class="prompt-text" id="targetScript">Loading...</div>
+
+    <!-- Controles de navegación y prueba -->
+    <div class="controls">
+      <button class="btn-secondary" id="prevBtn" type="button">Previous</button>
+      <button id="startBtn" type="button">Start Test</button>
+      <button class="btn-secondary" id="nextBtn" type="button">Next</button>
+    </div>
+
+    <!-- Panel de Retroalimentación -->
+    <div class="feedback-panel" id="feedbackPanel">
+      <h3>Feedback & Performance</h3>
+      <div id="scoreBadge" class="score-badge">Accuracy: --%</div>
+      <p style="margin-bottom: 0.5rem; color: #475569; font-size: 0.9rem;">
+        <strong>Transcript Alignment:</strong> (Green = Correctly spoken, Red = Omitted or mispronounced)
+      </p>
+      <div id="scriptComparison" style="line-height: 2; font-size: 1.15rem; margin-bottom: 1.5rem;"></div>
+
+      <div class="audio-comparison">
+        <div class="audio-row">
+          <span>Your recording:</span>
+          <audio id="userAudioPlayback" controls></audio>
+        </div>
+        <div class="audio-row">
+          <span>Model pronunciation:</span>
+          <button class="btn-secondary" id="playModelBtn" type="button" style="padding: 0.4rem 1rem;">Listen to Model Voice</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 20 GUIONES ORGANIZADOS EN PROGRESIÓN (B1 A B2)
+    const questions = [
+      { id: 1, level: "B1", script: "Community gardens have transformed vacant industrial lots into vibrant social spaces across metropolitan areas. Local residents gather regularly to cultivate fresh vegetables, maintain compost systems, and exchange traditional gardening knowledge. Beyond providing affordable nutrition, these collaborative projects foster a strong sense of belonging and improve local biodiversity within concrete urban landscapes." },
+      { id: 2, level: "B1", script: "The shift toward solar energy has accelerated significantly over the past decade. Modern cities are now incorporating photovoltaic panels directly into the facades of high-rise buildings. This architectural innovation not only generates clean electricity on site, but also helps to reduce heat absorption in crowded urban areas during the warm summer months." },
+      { id: 3, level: "B1", script: "Modern transit authorities are investing heavily in unified electronic ticketing and synchronized bus networks to discourage private automobile usage. High-capacity light rail lines provide predictable travel times, reducing rush-hour gridlock on major highways. Urban planners argue that equitable mobility options improve local air quality while expanding employment accessibility for suburban commuters." },
+      { id: 4, level: "B1", script: "Quality sleep plays a fundamental role in memory consolidation and general brain health. During deep resting stages, the brain reorganizes daytime memories, transferring critical details into permanent cognitive storage. Health researchers emphasize that chronic sleep deprivation severely impairs emotional regulation, reaction time, and the ability to solve complex mathematical problems during daily activities." },
+      { id: 5, level: "B1", script: "Honeybees communicate the precise location of nectar sources using an intricate series of movements called the waggle dance. By adjusting the angle of their dance relative to the sun, returning foragers inform the entire hive about flight distance and direction. This sophisticated navigational behavior demonstrates remarkable collaborative intelligence in small insect colonies." },
+      { id: 6, level: "B1+", script: "The traditional method of papermaking emerged in ancient China before spreading along trade routes toward the Mediterranean basin. Artisans mashed mulberry fibers and discarded rags into a liquid pulp, pressing the mixture into flat porous screens. This durable and lightweight writing medium eventually replaced bulky clay tablets, profoundly democratizing written communication worldwide." },
+      { id: 7, level: "B1+", script: "Immersive virtual reality simulations are gradually transforming conventional higher education classrooms. Medical students can now perform delicate simulated surgeries, while archeologists explore detailed three-dimensional reconstructions of ruined temples. These interactive experiences enhance spatial comprehension and allow learners to practice intricate practical procedures without facing real-world financial or safety consequences." },
+      { id: 8, level: "B1+", script: "Long before the invention of the printing press, ancient libraries were vital centers of philosophical debate and scholarship. Scribes carefully transcribed delicate papyrus scrolls by hand, preserving knowledge for future generations. While many collections were lost to fire and conflict, surviving fragments provide invaluable glimpses into early astronomy, medicine, and legal traditions." },
+      { id: 9, level: "B1+", script: "Desert vegetation exhibits remarkable physiological adaptations designed to minimize water loss under relentless daytime heat. Many cactus varieties store vast quantities of moisture inside thick fleshy stems while substituting traditional broad leaves with sharp protective spines. Additionally, their root systems spread horizontally near the soil surface to absorb sudden seasonal rainfall rapidly." },
+      { id: 10, level: "B1+", script: "Remote island communities are replacing expensive diesel generators with standalone microgrid systems powered by wind turbines and battery arrays. These localized networks stabilize power distribution during severe storms when transmission lines from the mainland are severed. Decentralized energy generation provides greater economic resilience while drastically lowering maritime fuel transportation costs." },
+      { id: 11, level: "B2", script: "Early mapmakers faced immense difficulty when attempting to represent our spherical planet on flat parchment surfaces. Every projection introduced noticeable distortions in either geographical shape, distance, or total land area. Over centuries, cartographers refined mathematical calculations and utilized magnetic compasses to establish reliable shipping routes across previously uncharted oceanic waters." },
+      { id: 12, level: "B2", script: "Exploring the deepest trenches of the ocean presents extraordinary technical challenges for marine biologists. In these sunless zones, water pressure reaches crushing levels and temperatures hover just above freezing. Despite these extreme conditions, scientists continue to discover specialized organisms that produce their own light through complex chemical reactions known as bioluminescence." },
+      { id: 13, level: "B2", script: "Glaciers function as massive flowing rivers of dense ice that carve dramatic valleys across mountain ranges. As snow compresses into solid blue ice over centuries, gravitational forces pull the mass downhill at variable speeds. Glaciologists monitor terminal ice boundaries closely because accelerating melt rates serve as definitive indicators of broader global climatic shifts." },
+      { id: 14, level: "B2", script: "Regions surrounding active volcanoes often feature exceptionally fertile agricultural farmland despite the persistent threat of seismic activity. Weathered volcanic ash deposits enrich the topsoil with vital minerals, including potassium, phosphorus, and iron. Farmers cultivate profitable vineyards and coffee plantations on steep slopes, taking advantage of nutrients accumulated over centuries of periodic eruptions." },
+      { id: 15, level: "B2", script: "Mechanical pendulum clocks revolutionized navigation and industrial production when they first appeared in seventeenth-century Europe. Before their widespread adoption, communities relied on sundials and water clocks, which were vulnerable to seasonal changes and cloudy weather. Precise seconds and minutes soon became the universal framework coordinating international commerce and train schedules." },
+      { id: 16, level: "B2+", script: "Linguists estimate that a significant percentage of the world's indigenous languages risk extinction over the coming decades. When an elder language disappears, unique cultural concepts, oral histories, and botanical knowledge vanish alongside it. Contemporary revitalization initiatives use digital voice recording archives and mobile learning applications to teach younger generations their ancestral mother tongues." },
+      { id: 17, level: "B2+", script: "Beneath the forest floor lies a dense underground network of fungal threads connecting individual tree root systems. Known to ecologists as mycorrhizal networks, these biological pathways facilitate the exchange of water, carbon, and crucial mineral nutrients. Furthermore, mature trees frequently use this subterranean system to transmit chemical warning signals when pest infestations occur." },
+      { id: 18, level: "B2+", script: "Lichens are not single organisms, but rather complex symbiotic partnerships between fungi and photosynthetic algae. The fungus constructs a protective outer structure, while the algae synthesize food through sunlight exposure. Because they absorb atmospheric moisture without standard roots, lichens are uniquely sensitive to airborne contaminants and serve as natural environmental quality indicators." },
+      { id: 19, level: "B2+", script: "Restoring historic stone monuments requires a careful balance between scientific analysis and traditional craftsmanship. Environmental pollutants and acid rain gradually weaken porous limestone facades over extended periods. Conservators must apply specialized chemical treatments that consolidate crumbling mineral layers without sealing moisture inside the structural interior of the landmark building." },
+      { id: 20, level: "B2+", script: "Designing a symphony hall demands precise manipulation of sound reflections to ensure acoustic clarity for every audience member. Convex wooden panels along the ceiling diffuse high-frequency notes, while heavy stage curtains absorb unwanted reverberations. Sound engineers collaborate closely with architects to achieve rich acoustic balance without generating distracting echoes or auditory blind spots." }
+    ];
+
+    let currentIndex = 0;
+    const PREPARATION_TIME = 25;
+    const RECORDING_TIME = 35;
+
+    let mediaRecorder;
+    let audioChunks = [];
+    let timerInterval;
+    let recognition = null;
+    let spokenTranscript = "";
+
+    const counterLabel = document.getElementById('counterLabel');
+    const levelLabel = document.getElementById('levelLabel');
+    const targetScript = document.getElementById('targetScript');
+    const boxTitle = document.getElementById('boxTitle');
+    const timerLabel = document.getElementById('timerLabel');
+    const progressBar = document.getElementById('progressBar');
+    const startBtn = document.getElementById('startBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const feedbackPanel = document.getElementById('feedbackPanel');
+    const scoreBadge = document.getElementById('scoreBadge');
+    const scriptComparison = document.getElementById('scriptComparison');
+    const userAudioPlayback = document.getElementById('userAudioPlayback');
+    const playModelBtn = document.getElementById('playModelBtn');
+
+    function loadQuestion(index) {
+      if (timerInterval) clearInterval(timerInterval);
+      feedbackPanel.style.display = 'none';
+      startBtn.disabled = false;
+      boxTitle.textContent = "STATUS";
+      timerLabel.textContent = 'Click "Start Test" to begin';
+      timerLabel.classList.remove('recording');
+      progressBar.style.width = '0%';
+
+      const q = questions[index];
+      counterLabel.textContent = `Question ${q.id} of ${questions.length}`;
+      levelLabel.textContent = `Level: ${q.level}`;
+      targetScript.textContent = q.script;
+
+      prevBtn.disabled = (index === 0);
+      nextBtn.disabled = (index === questions.length - 1);
+    }
+
+    function playBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+      } catch (e) {
+        console.warn("Beep audio context notice:", e);
+      }
+    }
+
+    async function startTest() {
+      startBtn.disabled = true;
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+      feedbackPanel.style.display = 'none';
+      spokenTranscript = "";
+
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (err) {
+        alert("Microphone access is required to take this test. Please check browser permissions.");
+        startBtn.disabled = false;
+        prevBtn.disabled = (currentIndex === 0);
+        nextBtn.disabled = (currentIndex === questions.length - 1);
+        return;
+      }
+
+      boxTitle.textContent = "PREPARATION";
+      let timeLeft = PREPARATION_TIME;
+      timerLabel.textContent = `Beginning in ${timeLeft} seconds`;
+      timerLabel.classList.remove('recording');
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        const percentage = ((PREPARATION_TIME - timeLeft) / PREPARATION_TIME) * 100;
+        progressBar.style.width = `${percentage}%`;
+
+        if (timeLeft > 0) {
+          timerLabel.textContent = `Beginning in ${timeLeft} seconds`;
+        } else {
+          clearInterval(timerInterval);
+          playBeep();
+          setTimeout(() => startRecording(stream), 500);
+        }
+      }, 1000);
+    }
+
+    function startRecording(stream) {
+      audioChunks = [];
+      try {
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) audioChunks.push(e.data);
+        };
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          userAudioPlayback.src = URL.createObjectURL(audioBlob);
+          stream.getTracks().forEach(t => t.stop());
+          evaluateReading();
+        };
+        mediaRecorder.start();
+      } catch (e) {
+        console.warn("MediaRecorder error:", e);
+      }
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        try {
+          recognition = new SpeechRecognition();
+          recognition.continuous = true;
+          recognition.interimResults = false;
+          recognition.lang = 'en-US';
+          recognition.onresult = (event) => {
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              if (event.results[i].isFinal) {
+                spokenTranscript += " " + event.results[i][0].transcript;
+              }
+            }
+          };
+          recognition.start();
+        } catch (e) {
+          console.warn("Speech recognition notice:", e);
+        }
+      }
+
+      boxTitle.textContent = "RECORDING";
+      timerLabel.classList.add('recording');
+      let recLeft = RECORDING_TIME;
+      progressBar.style.width = '0%';
+      timerLabel.textContent = `Time remaining: ${recLeft}s`;
+
+      const recInterval = setInterval(() => {
+        recLeft--;
+        const percentage = ((RECORDING_TIME - recLeft) / RECORDING_TIME) * 100;
+        progressBar.style.width = `${percentage}%`;
+        timerLabel.textContent = `Time remaining: ${recLeft}s`;
+
+        if (recLeft <= 0) {
+          clearInterval(recInterval);
+          if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+          if (recognition) { try { recognition.stop(); } catch(e){} }
+          boxTitle.textContent = "COMPLETED";
+          timerLabel.textContent = "Test Completed";
+          startBtn.disabled = false;
+          prevBtn.disabled = (currentIndex === 0);
+          nextBtn.disabled = (currentIndex === questions.length - 1);
+        }
+      }, 1000);
+    }
+
+    function cleanWord(str) {
+      return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function evaluateReading() {
+      const originalWords = questions[currentIndex].script.split(/\s+/);
+      const spokenWords = spokenTranscript.split(/\s+/).map(cleanWord).filter(w => w.length > 0);
+
+      let correctCount = 0;
+      let spokenIdx = 0;
+      let htmlOutput = "";
+
+      originalWords.forEach(word => {
+        const clean = cleanWord(word);
+        const searchWindow = spokenWords.slice(spokenIdx, spokenIdx + 4);
+        const found = searchWindow.indexOf(clean);
+
+        if (found !== -1) {
+          correctCount++;
+          spokenIdx += found + 1;
+          htmlOutput += `<span class="word-correct">${word}</span> `;
+        } else {
+          htmlOutput += `<span class="word-missed">${word}</span> `;
+        }
+      });
+
+      const accuracy = originalWords.length > 0 ? Math.round((correctCount / originalWords.length) * 100) : 0;
+      scoreBadge.textContent = `Accuracy: ${accuracy}% (${correctCount} of ${originalWords.length} words)`;
+      scriptComparison.innerHTML = htmlOutput;
+      feedbackPanel.style.display = 'block';
+    }
+
+    // Modelo de pronunciación nativa sintetizada
+    playModelBtn.addEventListener('click', () => {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(questions[currentIndex].script);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.95;
+      window.speechSynthesis.speak(utterance);
+    });
+
+    startBtn.addEventListener('click', startTest);
+    prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) { currentIndex--; loadQuestion(currentIndex); }
+    });
+    nextBtn.addEventListener('click', () => {
+      if (currentIndex < questions.length - 1) { currentIndex++; loadQuestion(currentIndex); }
+    });
+
+    loadQuestion(0);
+  </script>
+</body>
+</html>
