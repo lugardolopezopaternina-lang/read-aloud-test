@@ -1,269 +1,311 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Speaking and Reading: Read Aloud</title>
-<style>
-  * { box-sizing: border-box; font-family: "Segoe UI", Roboto, sans-serif; }
-  body { background: #f1f5f9; padding: 2rem 1rem; display: flex; justify-content: center; margin: 0; }
-  .card { background: #fff; width: 100%; max-width: 820px; border: 1px solid #d0d5dd; border-radius: 8px; padding: 2.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-  .tag { background: #00877c; color: #fff; font-size: 0.8rem; font-weight: 700; padding: 0.35rem 0.8rem; display: inline-block; text-transform: uppercase; margin-bottom: 0.75rem; }
-  .title { font-size: 2.1rem; color: #00877c; font-family: Georgia, serif; font-style: italic; margin: 0 0 1rem 0; }
-  .title strong { font-style: normal; }
-  .meta { display: flex; justify-content: space-between; color: #64748b; font-weight: 600; margin-bottom: 0.75rem; }
-  .inst { font-size: 1rem; font-weight: 600; color: #1f2937; line-height: 1.5; margin-bottom: 1.5rem; }
-  .box { border: 2px solid #94a3b8; background: #f8fafc; border-radius: 6px; max-width: 380px; margin: 0 auto 1.5rem auto; text-align: center; padding: 1.2rem; }
-  .box.prep { border-color: #00877c; background: #f0fdf4; }
-  .box.rec { border-color: #d92d20; background: #fef2f2; }
-  .st-title { font-size: 0.85rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 0.4rem; }
-  .st-msg { font-size: 1.05rem; font-weight: 700; color: #1f2937; margin-bottom: 0.8rem; }
-  .bar-bg { width: 100%; height: 12px; background: #e2e8f0; border-radius: 99px; overflow: hidden; border: 1px solid #94a3b8; }
-  .bar { height: 100%; width: 0%; background: #00877c; transition: width 0.3s linear; }
-  .prompt { font-size: 1.2rem; line-height: 1.8; color: #334155; border-top: 1px solid #e2e8f0; padding-top: 1.5rem; margin-bottom: 1.5rem; }
-  .btns { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
-  button { background: #00877c; color: #fff; border: none; padding: 0.75rem 1.4rem; font-size: 0.95rem; font-weight: 600; border-radius: 4px; cursor: pointer; }
-  button:disabled { background: #cbd5e1; cursor: not-allowed; }
-  .b-sec { background: #475569; }
-  .b-rec { background: #0284c7; }
-  .b-stop { background: #d92d20; display: none; }
-  .audio-box { margin-top: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-  .audio-box span { font-weight: 600; font-size: 0.95rem; color: #475569; }
-  .audio-box audio { width: 100%; max-width: 460px; }
-  .fb { display: none; margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0; }
-  .badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 0.4rem 0.9rem; border-radius: 99px; font-weight: 700; margin-bottom: 1rem; }
-  .w-ok { color: #15803d; font-weight: 700; }
-  .w-bad { color: #d92d20; text-decoration: line-through; margin-right: 2px; }
-  .heard { background: #f1f5f9; border-left: 4px solid #00877c; padding: 0.75rem 1rem; font-size: 0.95rem; margin-bottom: 1.5rem; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speaking and Reading: Read Aloud</title>
+  <style>
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #f1f5f9; padding: 2rem 1rem; display: flex; justify-content: center; margin: 0; }
+    .card { background: #ffffff; width: 100%; max-width: 820px; border: 1px solid #d0d5dd; border-radius: 8px; padding: 2.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .tag { background-color: #00877c; color: white; font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; padding: 0.35rem 0.8rem; display: inline-block; text-transform: uppercase; margin-bottom: 0.75rem; }
+    .title { font-size: 2.2rem; color: #00877c; font-family: Georgia, serif; font-style: italic; margin: 0 0 1rem 0; }
+    .title strong { font-style: normal; font-weight: 700; }
+    .meta { display: flex; justify-content: space-between; color: #64748b; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.75rem; }
+    .instructions { font-size: 1.05rem; font-weight: 600; color: #1f2937; line-height: 1.5; margin-bottom: 1.5rem; }
+    .recorder-box { border: 2px solid #94a3b8; background: #f8fafc; border-radius: 6px; width: 380px; margin: 0 auto 1.5rem auto; text-align: center; padding: 1.25rem 1rem; }
+    .recorder-box.prep { border-color: #00877c; background: #f0fdf4; }
+    .recorder-box.rec { border-color: #d92d20; background: #fef2f2; }
+    .status-title { font-size: 0.85rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+    .status-message { font-size: 1.1rem; font-weight: 700; color: #1f2937; min-height: 1.5rem; margin-bottom: 1rem; }
+    .progress-bar-container { width: 100%; height: 12px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 999px; overflow: hidden; }
+    .progress-bar { height: 100%; width: 0%; background: #00877c; transition: width 0.3s linear; }
+    .prompt-text { font-size: 1.2rem; line-height: 1.85; color: #334155; border-top: 1px solid #e2e8f0; padding-top: 1.5rem; margin-bottom: 1.5rem; }
+    .controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+    button { background: #00877c; color: white; border: none; padding: 0.75rem 1.4rem; font-size: 0.95rem; font-weight: 600; border-radius: 4px; cursor: pointer; }
+    button:disabled { background: #cbd5e1; cursor: not-allowed; }
+    .btn-sec { background: #475569; }
+    .btn-rec { background: #0284c7; }
+    .btn-stop { background: #d92d20; display: none; }
+    .audio-row { margin-top: 1.5rem; background: #f8fafc; padding: 1.2rem; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .audio-row span { font-weight: 600; font-size: 0.95rem; color: #475569; width: 180px; }
+    .audio-row audio { width: 100%; max-width: 460px; }
+    .feedback-panel { display: none; margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0; }
+    .badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 0.4rem 0.9rem; border-radius: 9999px; font-weight: 700; margin-bottom: 1rem; }
+    .w-ok { color: #15803d; font-weight: 700; }
+    .w-bad { color: #d92d20; text-decoration: line-through; margin-right: 2px; }
+    .heard-box { background: #f1f5f9; border-left: 4px solid #00877c; padding: 0.75rem 1rem; font-size: 0.95rem; margin-bottom: 1.5rem; }
+  </style>
 </head>
 <body>
 
-<div class="card">
-  <div class="tag">Benchmark Test Question Types</div>
-  <div class="title"><strong>Speaking and Reading:</strong> Read Aloud</div>
+  <div class="card">
+    <div class="tag">Benchmark Test Question Types</div>
+    <div class="title"><strong>Speaking and Reading:</strong> Read Aloud</div>
 
-  <div class="meta">
-    <span id="counterLabel">Question 1 of 10</span>
-    <span id="levelLabel">Level: B1</span>
-  </div>
-
-  <div class="inst">
-    Step A: Click "Start Preparation (25s)" to read silently.<br>
-    Step B: Click "Start Recording (60s)" and read the text aloud clearly (Use Edge or Chrome).
-  </div>
-
-  <div class="box" id="recorderBox">
-    <div class="st-title" id="boxTitle">READY</div>
-    <div class="st-msg" id="timerLabel">Choose an option below to start</div>
-    <div class="bar-bg"><div class="bar" id="progressBar"></div></div>
-  </div>
-
-  <div class="prompt" id="targetScript">
-    I really thought today would be different. I woke up early, made actual coffee instead of that terrible instant stuff, and even ironed my shirt. For once, I felt completely in control of my life. Then, I heard the heavy click of the front door shutting behind me, and my stomach dropped. My keys are sitting right there on the kitchen counter, next to my phone and my wallet. Now I’m standing in the hallway in my socks, listening to my phone ring inside an empty apartment. Sometimes I wonder if the universe is trying to tell me to stay in bed.
-  </div>
-
-  <div class="btns">
-    <button class="b-sec" id="prevBtn" type="button" onclick="prevQ()" disabled>Previous</button>
-    <button id="prepBtn" type="button" onclick="startPrep()">Start Preparation (25s)</button>
-    <button class="b-rec" id="recBtn" type="button" onclick="startRec()">Start Recording (60s)</button>
-    <button class="b-stop" id="stopBtn" type="button" onclick="stopRec()">Stop & Evaluate</button>
-    <button class="b-sec" id="nextBtn" type="button" onclick="nextQ()">Next</button>
-  </div>
-
-  <div class="audio-box">
-    <span>Model Audio:</span>
-    <audio id="modelAudio" controls src="audio1.mp3"></audio>
-  </div>
-
-  <div class="fb" id="feedbackPanel">
-    <h3>Feedback & Performance</h3>
-    <div id="scoreBadge" class="badge">Accuracy: --%</div>
-    <div class="heard">
-      <strong>What the system heard:</strong>
-      <p id="heardText" style="margin:0.3rem 0 0 0; font-style:italic;">(Waiting for speech...)</p>
+    <div class="meta">
+      <span id="counterLabel">Question 1 of 10</span>
+      <span id="levelLabel">Level: B1</span>
     </div>
-    <div id="scriptComp" style="line-height: 2; font-size: 1.15rem; margin-bottom: 1.5rem;"></div>
-    <div class="audio-box" id="userAudioBox" style="display:none;">
-      <span>Your Recording:</span>
-      <audio id="userAudio" controls></audio>
+
+    <div class="instructions">
+      Preparation time: 25 seconds. Reading time: 60 seconds. Read aloud clearly into your microphone using Microsoft Edge or Google Chrome.
+    </div>
+
+    <div class="recorder-box" id="recorderBox">
+      <div class="status-title" id="boxTitle">STATUS</div>
+      <div class="status-message" id="timerLabel">Click "Start Preparation" to begin</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+
+    <div class="prompt-text" id="targetScript">
+      I really thought today would be different. I woke up early, made actual coffee instead of that terrible instant stuff, and even ironed my shirt. For once, I felt completely in control of my life. Then, I heard the heavy click of the front door shutting behind me, and my stomach dropped. My keys are sitting right there on the kitchen counter, next to my phone and my wallet. Now I’m standing in the hallway in my socks, listening to my phone ring inside an empty apartment. Sometimes I wonder if the universe is trying to tell me to stay in bed.
+    </div>
+
+    <div class="controls">
+      <button class="btn-sec" id="prevBtn" type="button" onclick="prevQ()" disabled>Previous</button>
+      <button id="prepBtn" type="button" onclick="startPrep()">Start Preparation (25s)</button>
+      <button class="btn-rec" id="recBtn" type="button" onclick="startRec()">Start Recording (60s)</button>
+      <button class="btn-stop" id="stopBtn" type="button" onclick="stopRec()">Stop & Evaluate</button>
+      <button class="btn-sec" id="nextBtn" type="button" onclick="nextQ()">Next</button>
+    </div>
+
+    <div class="audio-row">
+      <span>Model audio (Reference):</span>
+      <audio id="modelAudio" controls src="audio1.mp3"></audio>
+    </div>
+
+    <div class="feedback-panel" id="feedbackPanel">
+      <h3>Feedback & Performance</h3>
+      <div id="scoreBadge" class="badge">Accuracy: --%</div>
+
+      <div class="heard-box">
+        <strong>Transcript Alignment:</strong>
+        <p id="heardText" style="margin: 0.25rem 0 0 0; font-style: italic; color: #475569;">(Waiting for speech...)</p>
+      </div>
+
+      <div id="scriptComp" style="line-height: 2; font-size: 1.15rem; margin-bottom: 1.5rem;"></div>
+
+      <div class="audio-row" id="userAudioBox" style="display:none;">
+        <span>Your recording:</span>
+        <audio id="userAudio" controls></audio>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-const questions = [
-  { id: 1, level: "B1", audio: "audio1.mp3", script: "I really thought today would be different. I woke up early, made actual coffee instead of that terrible instant stuff, and even ironed my shirt. For once, I felt completely in control of my life. Then, I heard the heavy click of the front door shutting behind me, and my stomach dropped. My keys are sitting right there on the kitchen counter, next to my phone and my wallet. Now I’m standing in the hallway in my socks, listening to my phone ring inside an empty apartment. Sometimes I wonder if the universe is trying to tell me to stay in bed." },
-  { id: 2, level: "B1", audio: "audio2.mp3", script: "Please don't look at my resume too closely. Yes, it says I'm fluent in French, and technically, I did pass an online course three years ago, so that isn't a complete lie. If you ask me to order a croissant, I will absolutely shine. However, if you expect me to negotiate a corporate merger in Paris, we might run into a slight communication barrier. What I lack in vocabulary, though, I make up for in sheer panic-driven determination. Hire me, and I promise I will work twice as hard just to cover up the things I don't actually know yet." },
-  { id: 3, level: "B1+", audio: "audio3.mp3", script: "The station platform was supposed to be empty at midnight, yet there she was, holding a bright yellow umbrella under a completely clear sky. I told myself to look away and mind my own business, just like anyone living in this city would do. When the train finally pulled in, the lights inside the carriages flickered and died for a second. By the time they came back on, she was gone, but the yellow umbrella was lying right at my feet. Inside the handle, someone had taped a small brass key and a note with my own name on it." },
-  { id: 4, level: "B1+", audio: "audio4.mp3", script: "You don't need to keep apologizing, because honestly, I saw this coming months ago. People don't just suddenly stop asking how your day went unless they've already checked out of the relationship. I kept making excuses for you—telling myself you were just stressed with work or tired from the commute. The truth is, I was working overtime to keep us together while you were quietly packing your bags in your head. I'm not even angry anymore; I'm just exhausted from trying to love someone who isn't really in the room. Take your things, and please, just close the door quietly." },
-  { id: 5, level: "B1+", audio: "audio5.mp3", script: "Thank you so much for seeing me today! I know the casting call asked for a fierce, intimidating medieval warrior, and I realize I look more like an accountant who gets nervous ordering spicy food. However, acting is all about transformation, isn't it? If you just squint a little and ignore my glasses, you can practically see the bloodthirsty rage behind my eyes. Wait, please don't write anything down yet! Let me show you my battle cry. Okay, maybe that sounded a bit like a startled seagull, but with proper lighting and a heavy sword, I’ll be terrifying, I swear!" },
-  { id: 6, level: "B2", audio: "audio6.mp3", script: "We buried this rusty metal box in the backyard twenty years ago, convinced we would still be best friends when we dug it up. Looking at these faded photographs and silly notes now, it feels like I’m reading about strangers. Back then, our biggest worry was passing math class and saving enough allowance to buy concert tickets. We promised we would never become boring adults who cared about mortgages and rush hour traffic, yet here I am, checking my watch before I even finish opening it. I wonder where you are today, and if you ever think about this afternoon." },
-  { id: 7, level: "B2", audio: "audio7.mp3", script: "Everyone in this family thinks my grandmother’s famous chocolate cake is a hundred-year-old culinary masterpiece passed down through generations. Before she passed away, she made me swear I would protect the secret with my life, and finally handed me the locked recipe box. Do you want to know what was inside? An empty cardboard box of supermarket cake mix and a sticky note that said, \"Just add an extra egg and a spoonful of instant coffee.\" I have been lying to my relatives every Christmas for five years, and honestly, the guilt tastes almost as good as the frosting." },
-  { id: 8, level: "B2", audio: "audio8.mp3", script: "If you are watching this video, it means I didn't make it to the airport in time. For the past three years, I’ve been working in the accounting department at NexaCorp, and what I discovered last Tuesday goes way beyond simple tax evasion. They aren't just hiding money; they are covering up safety failures that could affect thousands of people in this city. I tried taking the files to my supervisor, and twenty minutes later, my security badge was deactivated. Everything you need to prove what they've done is on the blue flash drive taped underneath my desk drawer." },
-  { id: 9, level: "B2+", audio: "audio9.mp3", script: "Social media really lied to me about backpacking through Europe. In the photos, everyone looks effortless and glowing while sipping espresso in quiet cobblestone alleys. Meanwhile, I have been carrying a forty-pound backpack up six flights of stairs because the hostel elevator has been broken since 1998. Yesterday, I accidentally boarded an express train going in the completely wrong direction and ended up in a tiny village where nobody speaks English, and the only restaurant was closed for a local goat festival. My feet hurt, I’m broke, and yet, strangely enough, I don't think I want to go home." },
-  { id: 10, level: "B2+", audio: "audio10.mp3", script: "I know I’m the last person you want to see on your doorstep right now, and if you slam the door in my face, I completely deserve it. Back then, I was so terrified of failing that I chose to ruin everything before it had a chance to fall apart on its own. Walking away without an explanation was cowardly, and it’s the biggest regret of my life. I didn't come here expecting you to forgive me right away, or even at all. I just needed you to know that you were never the problem—I was." }
-];
+  <script>
+    const questions = [
+      { id: 1, level: "B1", audio: "audio1.mp3", script: "I really thought today would be different. I woke up early, made actual coffee instead of that terrible instant stuff, and even ironed my shirt. For once, I felt completely in control of my life. Then, I heard the heavy click of the front door shutting behind me, and my stomach dropped. My keys are sitting right there on the kitchen counter, next to my phone and my wallet. Now I’m standing in the hallway in my socks, listening to my phone ring inside an empty apartment. Sometimes I wonder if the universe is trying to tell me to stay in bed." },
+      { id: 2, level: "B1", audio: "audio2.mp3", script: "Please don't look at my resume too closely. Yes, it says I'm fluent in French, and technically, I did pass an online course three years ago, so that isn't a complete lie. If you ask me to order a croissant, I will absolutely shine. However, if you expect me to negotiate a corporate merger in Paris, we might run into a slight communication barrier. What I lack in vocabulary, though, I make up for in sheer panic-driven determination. Hire me, and I promise I will work twice as hard just to cover up the things I don't actually know yet." },
+      { id: 3, level: "B1+", audio: "audio3.mp3", script: "The station platform was supposed to be empty at midnight, yet there she was, holding a bright yellow umbrella under a completely clear sky. I told myself to look away and mind my own business, just like anyone living in this city would do. When the train finally pulled in, the lights inside the carriages flickered and died for a second. By the time they came back on, she was gone, but the yellow umbrella was lying right at my feet. Inside the handle, someone had taped a small brass key and a note with my own name on it." },
+      { id: 4, level: "B1+", audio: "audio4.mp3", script: "You don't need to keep apologizing, because honestly, I saw this coming months ago. People don't just suddenly stop asking how your day went unless they've already checked out of the relationship. I kept making excuses for you—telling myself you were just stressed with work or tired from the commute. The truth is, I was working overtime to keep us together while you were quietly packing your bags in your head. I'm not even angry anymore; I'm just exhausted from trying to love someone who isn't really in the room. Take your things, and please, just close the door quietly." },
+      { id: 5, level: "B1+", audio: "audio5.mp3", script: "Thank you so much for seeing me today! I know the casting call asked for a fierce, intimidating medieval warrior, and I realize I look more like an accountant who gets nervous ordering spicy food. However, acting is all about transformation, isn't it? If you just squint a little and ignore my glasses, you can practically see the bloodthirsty rage behind my eyes. Wait, please don't write anything down yet! Let me show you my battle cry. Okay, maybe that sounded a bit like a startled seagull, but with proper lighting and a heavy sword, I’ll be terrifying, I swear!" },
+      { id: 6, level: "B2", audio: "audio6.mp3", script: "We buried this rusty metal box in the backyard twenty years ago, convinced we would still be best friends when we dug it up. Looking at these faded photographs and silly notes now, it feels like I’m reading about strangers. Back then, our biggest worry was passing math class and saving enough allowance to buy concert tickets. We promised we would never become boring adults who cared about mortgages and rush hour traffic, yet here I am, checking my watch before I even finish opening it. I wonder where you are today, and if you ever think about this afternoon." },
+      { id: 7, level: "B2", audio: "audio7.mp3", script: "Everyone in this family thinks my grandmother’s famous chocolate cake is a hundred-year-old culinary masterpiece passed down through generations. Before she passed away, she made me swear I would protect the secret with my life, and finally handed me the locked recipe box. Do you want to know what was inside? An empty cardboard box of supermarket cake mix and a sticky note that said, \"Just add an extra egg and a spoonful of instant coffee.\" I have been lying to my relatives every Christmas for five years, and honestly, the guilt tastes almost as good as the frosting." },
+      { id: 8, level: "B2", audio: "audio8.mp3", script: "If you are watching this video, it means I didn't make it to the airport in time. For the past three years, I’ve been working in the accounting department at NexaCorp, and what I discovered last Tuesday goes way beyond simple tax evasion. They aren't just hiding money; they are covering up safety failures that could affect thousands of people in this city. I tried taking the files to my supervisor, and twenty minutes later, my security badge was deactivated. Everything you need to prove what they've done is on the blue flash drive taped underneath my desk drawer." },
+      { id: 9, level: "B2+", audio: "audio9.mp3", script: "Social media really lied to me about backpacking through Europe. In the photos, everyone looks effortless and glowing while sipping espresso in quiet cobblestone alleys. Meanwhile, I have been carrying a forty-pound backpack up six flights of stairs because the hostel elevator has been broken since 1998. Yesterday, I accidentally boarded an express train going in the completely wrong direction and ended up in a tiny village where nobody speaks English, and the only restaurant was closed for a local goat festival. My feet hurt, I’m broke, and yet, strangely enough, I don't think I want to go home." },
+      { id: 10, level: "B2+", audio: "audio10.mp3", script: "I know I’m the last person you want to see on your doorstep right now, and if you slam the door in my face, I completely deserve it. Back then, I was so terrified of failing that I chose to ruin everything before it had a chance to fall apart on its own. Walking away without an explanation was cowardly, and it’s the biggest regret of my life. I didn't come here expecting you to forgive me right away, or even at all. I just needed you to know that you were never the problem—I was." }
+    ];
 
-let idx = 0, tInt = null, rInt = null, rec = null, mRec = null, chunks = [], isRec = false, finalTxt = "";
+    let idx = 0, tInt = null, rInt = null, rec = null, mRec = null, chunks = [], isRec = false, finalTxt = "";
 
-function clean(s) { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
+    function clean(s) { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
 
-function beep() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    o.frequency.value = 880; g.gain.value = 0.2;
-    o.connect(g); g.connect(ctx.destination);
-    o.start(); o.stop(ctx.currentTime + 0.35);
-  } catch (e) {}
-}
-
-function loadQ() {
-  if (tInt) clearInterval(tInt);
-  if (rInt) clearInterval(rInt);
-  isRec = false;
-  const q = questions[idx];
-  document.getElementById('counterLabel').textContent = "Question " + q.id + " of 10";
-  document.getElementById('levelLabel').textContent = "Level: " + q.level;
-  document.getElementById('targetScript').textContent = q.script;
-  document.getElementById('recorderBox').className = "box";
-  document.getElementById('boxTitle').textContent = "READY";
-  document.getElementById('timerLabel').textContent = "Choose an option below to start";
-  document.getElementById('progressBar').style.width = "0%";
-  document.getElementById('feedbackPanel').style.display = "none";
-  document.getElementById('prepBtn').style.display = "inline-block";
-  document.getElementById('recBtn').style.display = "inline-block";
-  document.getElementById('stopBtn').style.display = "none";
-  document.getElementById('modelAudio').src = q.audio;
-  document.getElementById('prevBtn').disabled = (idx === 0);
-  document.getElementById('nextBtn').disabled = (idx === 9);
-}
-
-function prevQ() { if (idx > 0) { idx--; loadQ(); } }
-function nextQ() { if (idx < 9) { idx++; loadQ(); } }
-
-function startPrep() {
-  if (tInt) clearInterval(tInt);
-  document.getElementById('prepBtn').style.display = "none";
-  document.getElementById('recorderBox').className = "box prep";
-  document.getElementById('boxTitle').textContent = "PREPARATION TIME (25s)";
-  let left = 25;
-  document.getElementById('timerLabel').textContent = "Read silently: " + left + "s remaining";
-  document.getElementById('progressBar').style.background = "#00877c";
-  document.getElementById('progressBar').style.width = "0%";
-
-  tInt = setInterval(() => {
-    left--;
-    document.getElementById('progressBar').style.width = (((25 - left) / 25) * 100) + "%";
-    if (left > 0) {
-      document.getElementById('timerLabel').textContent = "Read silently: " + left + "s remaining";
-    } else {
-      clearInterval(tInt);
-      beep();
-      document.getElementById('boxTitle').textContent = "PREPARATION DONE";
-      document.getElementById('timerLabel').textContent = "Click 'Start Recording (60s)' now!";
-    }
-  }, 1000);
-}
-
-function startRec() {
-  if (tInt) clearInterval(tInt);
-  if (rInt) clearInterval(rInt);
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert("Please open this test in Microsoft Edge or Google Chrome."); return; }
-
-  finalTxt = ""; isRec = true;
-  document.getElementById('prepBtn').style.display = "none";
-  document.getElementById('recBtn').style.display = "none";
-  document.getElementById('stopBtn').style.display = "inline-block";
-  document.getElementById('feedbackPanel').style.display = "block";
-  document.getElementById('heardText').textContent = "Listening... Speak aloud now!";
-  document.getElementById('scriptComp').innerHTML = "";
-  document.getElementById('scoreBadge').textContent = "Recording...";
-
-  rec = new SR();
-  rec.continuous = true;
-  rec.interimResults = true;
-  rec.lang = 'en-US';
-  rec.onresult = (e) => {
-    let inter = "";
-    for (let i = e.resultIndex; i < e.results.length; ++i) {
-      if (e.results[i].isFinal) finalTxt += " " + e.results[i][0].transcript;
-      else inter += e.results[i][0].transcript;
-    }
-    document.getElementById('heardText').textContent = (finalTxt + " " + inter).trim();
-  };
-  rec.onend = () => { if (isRec) { try { rec.start(); } catch(e){} } };
-  try { rec.start(); } catch(e){}
-
-  chunks = [];
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(st => {
+    function beep() {
       try {
-        mRec = new MediaRecorder(st);
-        mRec.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-        mRec.onstop = () => {
-          document.getElementById('userAudio').src = URL.createObjectURL(new Blob(chunks, { type: 'audio/webm' }));
-          document.getElementById('userAudioBox').style.display = "flex";
-          st.getTracks().forEach(t => t.stop());
-        };
-        mRec.start();
-      } catch(e){}
-    }).catch(()=>{});
-  }
-
-  document.getElementById('recorderBox').className = "box rec";
-  document.getElementById('boxTitle').textContent = "RECORDING NOW (SPEAK ALOUD)";
-  let left = 60;
-  document.getElementById('progressBar').style.background = "#d92d20";
-  document.getElementById('progressBar').style.width = "0%";
-  document.getElementById('timerLabel').textContent = "Speaking time left: " + left + "s";
-
-  rInt = setInterval(() => {
-    left--;
-    document.getElementById('progressBar').style.width = (((60 - left) / 60) * 100) + "%";
-    document.getElementById('timerLabel').textContent = "Speaking time left: " + left + "s";
-    if (left <= 0) stopRec();
-  }, 1000);
-}
-
-function stopRec() {
-  isRec = false;
-  if (rInt) clearInterval(rInt);
-  if (rec) { try { rec.stop(); } catch(e){} }
-  if (mRec && mRec.state !== 'inactive') { try { mRec.stop(); } catch(e){} }
-
-  document.getElementById('recorderBox').className = "box";
-  document.getElementById('boxTitle').textContent = "COMPLETED";
-  document.getElementById('timerLabel').textContent = "Check your score below";
-  document.getElementById('stopBtn').style.display = "none";
-  document.getElementById('prepBtn').style.display = "inline-block";
-  document.getElementById('recBtn').style.display = "inline-block";
-  setTimeout(evaluate, 300);
-}
-
-function evaluate() {
-  const orig = questions[idx].script.split(/\s+/);
-  const raw = document.getElementById('heardText').textContent;
-  const txt = (finalTxt.trim().length > 0 ? finalTxt : raw);
-  const spoken = txt.split(/\s+/).map(clean).filter(w => w.length > 0 && w !== 'listening' && w !== 'speak' && w !== 'aloud' && w !== 'now');
-
-  let ok = 0, sIdx = 0, html = "";
-  orig.forEach(w => {
-    const c = clean(w);
-    const f = spoken.slice(sIdx, sIdx + 12).indexOf(c);
-    if (f !== -1) {
-      ok++; sIdx += f + 1;
-      html += '<span class="w-ok">' + w + '</span> ';
-    } else {
-      html += '<span class="w-bad">' + w + '</span> ';
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.frequency.value = 880; g.gain.value = 0.2;
+        o.connect(g); g.connect(ctx.destination);
+        o.start(); o.stop(ctx.currentTime + 0.35);
+      } catch (e) {}
     }
-  });
-  const acc = Math.round((ok / orig.length) * 100);
-  document.getElementById('scoreBadge').textContent = "Accuracy: " + acc + "% (" + ok + " of " + orig.length + " words)";
-  document.getElementById('scriptComp').innerHTML = html;
-}
-</script>
+
+    function loadQ() {
+      if (tInt) clearInterval(tInt);
+      if (rInt) clearInterval(rInt);
+      isRec = false;
+
+      const q = questions[idx];
+      document.getElementById('counterLabel').textContent = "Question " + q.id + " of 10";
+      document.getElementById('levelLabel').textContent = "Level: " + q.level;
+      document.getElementById('targetScript').textContent = q.script;
+
+      const rBox = document.getElementById('recorderBox');
+      rBox.className = "recorder-box";
+      document.getElementById('boxTitle').textContent = "STATUS";
+      document.getElementById('timerLabel').textContent = 'Click "Start Preparation" to begin';
+      document.getElementById('progressBar').style.width = "0%";
+      document.getElementById('progressBar').style.background = "#00877c";
+
+      document.getElementById('feedbackPanel').style.display = "none";
+      document.getElementById('prepBtn').style.display = "inline-block";
+      document.getElementById('recBtn').style.display = "inline-block";
+      document.getElementById('stopBtn').style.display = "none";
+
+      const model = document.getElementById('modelAudio');
+      if (model) {
+        model.src = q.audio;
+        model.load();
+      }
+
+      document.getElementById('prevBtn').disabled = (idx === 0);
+      document.getElementById('nextBtn').disabled = (idx === 9);
+    }
+
+    function prevQ() { if (idx > 0) { idx--; loadQ(); } }
+    function nextQ() { if (idx < 9) { idx++; loadQ(); } }
+
+    function startPrep() {
+      if (tInt) clearInterval(tInt);
+      document.getElementById('prepBtn').style.display = "none";
+      
+      const rBox = document.getElementById('recorderBox');
+      rBox.className = "recorder-box prep";
+      document.getElementById('boxTitle').textContent = "PREPARATION TIME";
+      let left = 25;
+      document.getElementById('timerLabel').textContent = "Read silently: " + left + "s";
+      document.getElementById('progressBar').style.background = "#00877c";
+      document.getElementById('progressBar').style.width = "0%";
+
+      tInt = setInterval(() => {
+        left--;
+        document.getElementById('progressBar').style.width = (((25 - left) / 25) * 100) + "%";
+        if (left > 0) {
+          document.getElementById('timerLabel').textContent = "Read silently: " + left + "s";
+        } else {
+          clearInterval(tInt);
+          beep();
+          document.getElementById('boxTitle').textContent = "PREPARATION FINISHED";
+          document.getElementById('timerLabel').textContent = "Click 'Start Recording' and read aloud!";
+        }
+      }, 1000);
+    }
+
+    function startRec() {
+      if (tInt) clearInterval(tInt);
+      if (rInt) clearInterval(rInt);
+
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        alert("Please open this test in Microsoft Edge or Google Chrome to use speech recognition.");
+        return;
+      }
+
+      finalTxt = "";
+      isRec = true;
+
+      document.getElementById('prepBtn').style.display = "none";
+      document.getElementById('recBtn').style.display = "none";
+      document.getElementById('stopBtn').style.display = "inline-block";
+      document.getElementById('prevBtn').disabled = true;
+      document.getElementById('nextBtn').disabled = true;
+
+      document.getElementById('feedbackPanel').style.display = "block";
+      document.getElementById('heardText').textContent = "Listening... Speak aloud now!";
+      document.getElementById('scriptComp').innerHTML = "";
+      document.getElementById('scoreBadge').textContent = "Recording in progress...";
+
+      rec = new SR();
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.lang = 'en-US';
+
+      rec.onresult = (e) => {
+        let inter = "";
+        for (let i = e.resultIndex; i < e.results.length; ++i) {
+          if (e.results[i].isFinal) finalTxt += " " + e.results[i][0].transcript;
+          else inter += e.results[i][0].transcript;
+        }
+        document.getElementById('heardText').textContent = (finalTxt + " " + inter).trim();
+      };
+
+      rec.onend = () => {
+        if (isRec) { try { rec.start(); } catch(e){} }
+      };
+
+      try { rec.start(); } catch(e){}
+
+      chunks = [];
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+          try {
+            mRec = new MediaRecorder(stream);
+            mRec.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+            mRec.onstop = () => {
+              const blob = new Blob(chunks, { type: 'audio/webm' });
+              document.getElementById('userAudio').src = URL.createObjectURL(blob);
+              document.getElementById('userAudioBox').style.display = "flex";
+              stream.getTracks().forEach(t => t.stop());
+            };
+            mRec.start();
+          } catch(err){}
+        }).catch(()=>{});
+      }
+
+      const rBox = document.getElementById('recorderBox');
+      rBox.className = "recorder-box rec";
+      document.getElementById('boxTitle').textContent = "RECORDING NOW";
+      let left = 60;
+      document.getElementById('progressBar').style.background = "#d92d20";
+      document.getElementById('progressBar').style.width = "0%";
+      document.getElementById('timerLabel').textContent = "Reading time left: " + left + "s";
+
+      rInt = setInterval(() => {
+        left--;
+        document.getElementById('progressBar').style.width = (((60 - left) / 60) * 100) + "%";
+        document.getElementById('timerLabel').textContent = "Reading time left: " + left + "s";
+        if (left <= 0) stopRec();
+      }, 1000);
+    }
+
+    function stopRec() {
+      isRec = false;
+      if (rInt) clearInterval(rInt);
+      if (rec) { try { rec.stop(); } catch(e){} }
+      if (mRec && mRec.state !== 'inactive') { try { mRec.stop(); } catch(e){} }
+
+      document.getElementById('recorderBox').className = "recorder-box";
+      document.getElementById('boxTitle').textContent = "EVALUATION FINISHED";
+      document.getElementById('timerLabel').textContent = "Results displayed below";
+
+      document.getElementById('stopBtn').style.display = "none";
+      document.getElementById('prepBtn').style.display = "inline-block";
+      document.getElementById('recBtn').style.display = "inline-block";
+      document.getElementById('prevBtn').disabled = (idx === 0);
+      document.getElementById('nextBtn').disabled = (idx === 9);
+
+      setTimeout(evaluate, 300);
+    }
+
+    function evaluate() {
+      const orig = questions[idx].script.split(/\s+/);
+      const raw = document.getElementById('heardText').textContent;
+      const txt = (finalTxt.trim().length > 0 ? finalTxt : raw);
+      const spoken = txt.split(/\s+/).map(clean).filter(w => w.length > 0 && w !== 'listening' && w !== 'speak' && w !== 'aloud' && w !== 'now');
+
+      if (spoken.length === 0) {
+        document.getElementById('heardText').textContent = "No voice was detected. Verify your microphone permissions in Microsoft Edge or Chrome.";
+      }
+
+      let ok = 0, sIdx = 0, html = "";
+      orig.forEach(w => {
+        const c = clean(w);
+        const f = spoken.slice(sIdx, sIdx + 12).indexOf(c);
+        if (f !== -1) {
+          ok++; sIdx += f + 1;
+          html += '<span class="w-ok">' + w + '</span> ';
+        } else {
+          html += '<span class="w-bad">' + w + '</span> ';
+        }
+      });
+
+      const acc = Math.round((ok / orig.length) * 100);
+      document.getElementById('scoreBadge').textContent = "Accuracy: " + acc + "% (" + ok + " of " + orig.length + " words)";
+      document.getElementById('scriptComp').innerHTML = html;
+    }
+  </script>
 </body>
 </html>
