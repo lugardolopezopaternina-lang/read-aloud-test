@@ -216,5 +216,59 @@
     </div>
 
     <div class="instructions">
-      1. Click <strong>"Start Preparation (25s)"</strong> to read silently.<br>
-      2. When ready
+      Step 1: Click "Start Preparation (25s)" to read silently.<br>
+      Step 2: Click "Start Recording (60s)" and read aloud into your microphone.
+    </div>
+
+    <div class="recorder-box" id="recorderBox">
+      <div class="status-title" id="boxTitle">STEP 1: PREPARATION</div>
+      <div class="status-message" id="timerLabel">Click "1. Start Preparation" below</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+
+    <div class="prompt-text" id="targetScript">
+      I really thought today would be different. I woke up early, made actual coffee instead of that terrible instant stuff, and even ironed my shirt. For once, I felt completely in control of my life. Then, I heard the heavy click of the front door shutting behind me, and my stomach dropped. My keys are sitting right there on the kitchen counter, next to my phone and my wallet. Now I’m standing in the hallway in my socks, listening to my phone ring inside an empty apartment. Sometimes I wonder if the universe is trying to tell me to stay in bed.
+    </div>
+
+    <div class="controls">
+      <button class="btn-secondary" id="prevBtn" type="button" onclick="prevQuestion()" disabled>Previous</button>
+      <button id="prepBtn" type="button" onclick="startPrep()">1. Start Preparation (25s)</button>
+      <button class="btn-record" id="recBtn" type="button" onclick="startDirectRecording()">2. Start Recording (60s)</button>
+      <button class="btn-stop" id="stopBtn" type="button" onclick="stopEvaluation()">Stop & Evaluate Now</button>
+      <button class="btn-secondary" id="nextBtn" type="button" onclick="nextQuestion()">Next</button>
+    </div>
+
+    <div class="audio-comparison">
+      <div class="audio-row">
+        <span>Model audio (Reference):</span>
+        <audio id="modelAudioPlayback" controls src="audio1.mp3"></audio>
+      </div>
+    </div>
+
+    <div class="feedback-panel" id="feedbackPanel">
+      <h3>Feedback & Performance</h3>
+      <div id="scoreBadge" class="score-badge">Accuracy: --%</div>
+
+      <div class="heard-box">
+        <strong>Live Transcript (What the system heard):</strong>
+        <p id="systemHeardText" style="margin: 0.25rem 0 0 0; font-style: italic; color: #475569;">(Waiting for speech...)</p>
+      </div>
+
+      <p style="margin-bottom: 0.5rem; color: #475569; font-size: 0.9rem;">
+        <strong>Transcript Alignment:</strong> (Green = Correctly spoken, Red = Omitted or mispronounced)
+      </p>
+      <div id="scriptComparison" style="line-height: 2; font-size: 1.15rem; margin-bottom: 1.5rem;"></div>
+
+      <div class="audio-comparison" id="userAudioBox" style="display:none;">
+        <div class="audio-row">
+          <span>Your recording:</span>
+          <audio id="userAudioPlayback" controls></audio>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const questions
