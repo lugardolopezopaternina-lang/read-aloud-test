@@ -1,261 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Speaking and Reading: Read Aloud</title>
-  <style>
-    :root {
-      --primary-teal: #00877c;
-      --border-gray: #d0d5dd;
-      --text-dark: #1f2937;
-      --accent-red: #d92d20;
-      --accent-blue: #0284c7;
-      --accent-green: #15803d;
-      --bg-slate: #f8fafc;
-    }
-
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #f1f5f9; padding: 2rem 1rem; display: flex; justify-content: center; }
-
-    .test-card {
-      background: #ffffff;
-      width: 100%;
-      max-width: 820px;
-      border: 1px solid var(--border-gray);
-      border-radius: 8px;
-      padding: 2.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-
-    .benchmark-tag {
-      background-color: var(--primary-teal);
-      color: white;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      padding: 0.35rem 0.8rem;
-      display: inline-block;
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
-    }
-
-    .main-title {
-      font-size: 2.2rem;
-      color: var(--primary-teal);
-      font-family: Georgia, serif;
-      font-style: italic;
-      margin: 0 0 1rem 0;
-    }
-    .main-title strong { font-style: normal; font-weight: 700; }
-
-    .meta-bar {
-      display: flex;
-      justify-content: space-between;
-      color: #64748b;
-      font-weight: 600;
-      font-size: 0.95rem;
-      margin-bottom: 0.75rem;
-    }
-
-    .instructions {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      line-height: 1.5;
-      margin-bottom: 1.5rem;
-    }
-
-    .recorder-box {
-      border: 1px solid #94a3b8;
-      background: var(--bg-slate);
-      border-radius: 4px;
-      width: 340px;
-      margin: 0 auto 1.5rem auto;
-      text-align: center;
-      padding: 1.25rem 1rem;
-    }
-
-    .status-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #475569;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.5rem;
-    }
-
-    .status-message {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--accent-red);
-      min-height: 1.5rem;
-      margin-bottom: 1rem;
-    }
-    .status-message.recording { color: var(--accent-blue); }
-
-    .progress-bar-container {
-      width: 100%;
-      height: 12px;
-      background: #e2e8f0;
-      border: 1px solid #94a3b8;
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: #00877c;
-      transition: width 0.5s linear;
-    }
-
-    .prompt-text {
-      font-size: 1.2rem;
-      line-height: 1.85;
-      color: #334155;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .controls {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-
-    button {
-      background: var(--primary-teal);
-      color: white;
-      border: none;
-      padding: 0.7rem 1.5rem;
-      font-size: 0.95rem;
-      font-weight: 600;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:disabled { background: #cbd5e1; cursor: not-allowed; }
-    .btn-secondary { background: #475569; }
-    .btn-stop { background: var(--accent-red); display: none; }
-
-    .audio-comparison {
-      margin-top: 1.5rem;
-      background: var(--bg-slate);
-      padding: 1.2rem;
-      border-radius: 6px;
-      border: 1px solid #e2e8f0;
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-    }
-
-    .audio-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-    .audio-row span { font-weight: 600; font-size: 0.95rem; color: #475569; width: 170px; }
-    .audio-row audio { width: 100%; max-width: 480px; }
-
-    .feedback-panel {
-      display: none;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 2px solid #e2e8f0;
-    }
-
-    .score-badge {
-      display: inline-block;
-      background: #e0f2fe;
-      color: #0369a1;
-      padding: 0.4rem 0.9rem;
-      border-radius: 9999px;
-      font-weight: 700;
-      font-size: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .word-correct { color: var(--accent-green); font-weight: 700; }
-    .word-missed { color: var(--accent-red); text-decoration: line-through; margin-right: 2px; }
-
-    .heard-box {
-      background: #f1f5f9;
-      border-left: 4px solid var(--primary-teal);
-      padding: 0.75rem 1rem;
-      font-size: 0.95rem;
-      color: #334155;
-      margin-bottom: 1.5rem;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="test-card">
-    <div class="benchmark-tag">Benchmark Test Question Types</div>
-    <div class="main-title"><strong>Speaking and Reading:</strong> Read Aloud</div>
-
-    <div class="meta-bar">
-      <span id="counterLabel">Question 1 of 10</span>
-      <span id="levelLabel">Level: B1</span>
-    </div>
-
-    <div class="instructions">
-      Prepare to read the text aloud. Click "Start Test", wait for the countdown, and read clearly into your microphone.
-    </div>
-
-    <div class="recorder-box">
-      <div class="status-title" id="boxTitle">STATUS</div>
-      <div class="status-message" id="timerLabel">Click "Start Test" to begin</div>
-      <div class="progress-bar-container">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-    </div>
-
-    <div class="prompt-text" id="targetScript">
-      I really thought today would be different. I woke up early, made actual coffee instead of that terrible instant stuff, and even ironed my shirt. For once, I felt completely in control of my life. Then, I heard the heavy click of the front door shutting behind me, and my stomach dropped. My keys are sitting right there on the kitchen counter, next to my phone and my wallet. Now I’m standing in the hallway in my socks, listening to my phone ring inside an empty apartment. Sometimes I wonder if the universe is trying to tell me to stay in bed.
-    </div>
-
-    <div class="controls">
-      <button class="btn-secondary" id="prevBtn" type="button" onclick="prevQuestion()" disabled>Previous</button>
-      <button id="startBtn" type="button" onclick="startTest()">Start Test</button>
-      <button class="btn-stop" id="stopBtn" type="button" onclick="finishRecordingEarly()">Stop & Evaluate</button>
-      <button class="btn-secondary" id="nextBtn" type="button" onclick="nextQuestion()">Next</button>
-    </div>
-
-    <div class="audio-comparison">
-      <div class="audio-row">
-        <span>Model audio (Reference):</span>
-        <audio id="modelAudioPlayback" controls src="audio1.mp3"></audio>
-      </div>
-    </div>
-
-    <div class="feedback-panel" id="feedbackPanel">
-      <h3>Feedback & Performance</h3>
-      <div id="scoreBadge" class="score-badge">Accuracy: --%</div>
-
-      <div class="heard-box">
-        <strong>What the system heard:</strong>
-        <p id="systemHeardText" style="margin: 0.25rem 0 0 0; font-style: italic; color: #475569;">(No voice detected)</p>
-      </div>
-
-      <p style="margin-bottom: 0.5rem; color: #475569; font-size: 0.9rem;">
-        <strong>Transcript Alignment:</strong> (Green = Correctly spoken, Red = Omitted or mispronounced)
-      </p>
-      <div id="scriptComparison" style="line-height: 2; font-size: 1.15rem; margin-bottom: 1.5rem;"></div>
-
-      <div class="audio-comparison">
-        <div class="audio-row">
-          <span>Your recording:</span>
-          <audio id="userAudioPlayback" controls></audio>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
+<script>
     const questions = [
       {
         id: 1,
@@ -321,14 +64,15 @@
 
     let currentIndex = 0;
     const PREPARATION_TIME = 25;
-    const RECORDING_TIME = 60; // 60 segundos para permitir lectura completa y pausada
+    const RECORDING_TIME = 60;
 
     let mediaRecorder = null;
     let audioChunks = [];
+    let activeStream = null;
     let timerInterval = null;
     let recInterval = null;
     let recognition = null;
-    let isActivelyRecording = false;
+    let isEvaluationActive = false;
     let spokenWordsArray = [];
 
     function updateQuestionUI() {
@@ -382,24 +126,26 @@
       } catch (e) {}
     }
 
+    function cleanWord(str) {
+      return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
     async function startTest() {
       const startBtn = document.getElementById('startBtn');
       const timerLabel = document.getElementById('timerLabel');
       const progressBar = document.getElementById('progressBar');
       const boxTitle = document.getElementById('boxTitle');
 
-      boxTitle.textContent = "REQUESTING MIC...";
-      timerLabel.textContent = "Please allow microphone access...";
-
       startBtn.disabled = true;
       document.getElementById('prevBtn').disabled = true;
       document.getElementById('nextBtn').disabled = true;
       document.getElementById('feedbackPanel').style.display = 'none';
       spokenWordsArray = [];
+      audioChunks = [];
 
-      let stream;
+      // 1. Obtener acceso de micrófono de inmediato (un solo clic del usuario)
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        activeStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       } catch (err) {
         boxTitle.textContent = "MIC BLOCKED";
         timerLabel.textContent = "Please grant microphone permission";
@@ -410,6 +156,54 @@
         return;
       }
 
+      // 2. Pre-inicializar MediaRecorder con el canal abierto
+      try {
+        mediaRecorder = new MediaRecorder(activeStream);
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) audioChunks.push(e.data);
+        };
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          document.getElementById('userAudioPlayback').src = URL.createObjectURL(audioBlob);
+          if (activeStream) {
+            activeStream.getTracks().forEach(t => t.stop());
+            activeStream = null;
+          }
+          evaluateReading();
+        };
+      } catch (e) {}
+
+      // 3. Pre-inicializar SpeechRecognition en el mismo gesto de clic
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event) => {
+          // Solo acumular palabras si ya sonó el beep
+          if (!isEvaluationActive) return;
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              const chunk = event.results[i][0].transcript.trim();
+              const words = chunk.split(/\s+/).map(cleanWord).filter(w => w.length > 0);
+              spokenWordsArray.push(...words);
+            }
+          }
+        };
+
+        recognition.onend = () => {
+          if (isEvaluationActive) {
+            try { recognition.start(); } catch (e) {}
+          }
+        };
+
+        // Arrancarlo de inmediato para validar el permiso de una sola vez
+        try { recognition.start(); } catch (e) {}
+      }
+
+      // 4. Cuenta regresiva de preparación
       boxTitle.textContent = "PREPARATION";
       let timeLeft = PREPARATION_TIME;
       timerLabel.textContent = "Beginning in " + timeLeft + " seconds";
@@ -424,67 +218,28 @@
         } else {
           clearInterval(timerInterval);
           playBeep();
-          setTimeout(() => startRecording(stream), 400);
+          setTimeout(beginActiveRecording, 400);
         }
       }, 1000);
     }
 
-    function cleanWord(str) {
-      return str.toLowerCase().replace(/[^a-z0-9]/g, '');
-    }
+    function beginActiveRecording() {
+      // Activar la captura de palabras
+      isEvaluationActive = true;
+      spokenWordsArray = [];
 
-    function startRecording(stream) {
-      const timerLabel = document.getElementById('timerLabel');
-      const progressBar = document.getElementById('progressBar');
-      const boxTitle = document.getElementById('boxTitle');
-      const userAudioPlayback = document.getElementById('userAudioPlayback');
+      try {
+        if (mediaRecorder && mediaRecorder.state === 'inactive') {
+          mediaRecorder.start();
+        }
+      } catch (e) {}
 
-      isActivelyRecording = true;
       document.getElementById('startBtn').style.display = 'none';
       document.getElementById('stopBtn').style.display = 'inline-block';
 
-      audioChunks = [];
-      try {
-        mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = (e) => {
-          if (e.data.size > 0) audioChunks.push(e.data);
-        };
-        mediaRecorder.onstop = () => {
-          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-          userAudioPlayback.src = URL.createObjectURL(audioBlob);
-          stream.getTracks().forEach(t => t.stop());
-          evaluateReading();
-        };
-        mediaRecorder.start();
-      } catch (e) {}
-
-      // Configuración de Reconocimiento de Voz con reinicio automático
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = false;
-        recognition.lang = 'en-US';
-
-        recognition.onresult = (event) => {
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-              const chunk = event.results[i][0].transcript.trim();
-              const words = chunk.split(/\s+/).map(cleanWord).filter(w => w.length > 0);
-              spokenWordsArray.push(...words);
-            }
-          }
-        };
-
-        // Si el navegador se apaga por silencio entre frases, se reactiva solo
-        recognition.onend = () => {
-          if (isActivelyRecording) {
-            try { recognition.start(); } catch (e) {}
-          }
-        };
-
-        try { recognition.start(); } catch (e) {}
-      }
+      const boxTitle = document.getElementById('boxTitle');
+      const timerLabel = document.getElementById('timerLabel');
+      const progressBar = document.getElementById('progressBar');
 
       boxTitle.textContent = "RECORDING NOW";
       timerLabel.classList.add('recording');
@@ -505,14 +260,16 @@
     }
 
     function finishRecordingEarly() {
-      isActivelyRecording = false;
+      isEvaluationActive = false;
       if (recInterval) clearInterval(recInterval);
+
       if (mediaRecorder && mediaRecorder.state !== 'inactive') {
         mediaRecorder.stop();
       }
       if (recognition) {
         try { recognition.stop(); } catch (e) {}
       }
+
       document.getElementById('boxTitle').textContent = "COMPLETED";
       document.getElementById('timerLabel').textContent = "Evaluating...";
       document.getElementById('stopBtn').style.display = 'none';
@@ -540,7 +297,6 @@
 
       originalWords.forEach(word => {
         const clean = cleanWord(word);
-        // Margen elástico de 12 palabras para no penalizar pausas o palabras saltadas
         const searchWindow = spokenWordsArray.slice(spokenIdx, spokenIdx + 12);
         const found = searchWindow.indexOf(clean);
 
@@ -559,5 +315,3 @@
       document.getElementById('feedbackPanel').style.display = 'block';
     }
   </script>
-</body>
-</html>
